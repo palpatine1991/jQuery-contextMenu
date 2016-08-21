@@ -41,7 +41,8 @@
     "qunitjs": "^2.0.0",
     "wdio-dot-reporter": "0.0.6",
     "wdio-mocha-framework": "^0.4.0",
-    "wdio-selenium-standalone-service": "0.0.5"
+    "wdio-selenium-standalone-service": "0.0.5",
+    "webdriverio": "^4.2.7"
   },
   "description": "Management facility for context menus. Developed for a large number of triggering objects. HTML5 Polyfill",
   "keywords": [
