@@ -1,10 +1,12 @@
 /*!
  * jQuery contextMenu - Plugin for simple contextMenu handling
  *
- * Version: 1.6.6
+ * Version: 1.6.6.1
  *
  * Authors: Rodney Rehm, Addy Osmani (patches for FF)
  * Web: http://medialize.github.com/jQuery-contextMenu/
+ *
+ * Customization by palpatine1991
  *
  * Licensed under
  *   MIT License http://www.opensource.org/licenses/mit-license
@@ -22,6 +24,8 @@
 $.support.htmlMenuitem = ('HTMLMenuItemElement' in window);
 $.support.htmlCommand = ('HTMLCommandElement' in window);
 $.support.eventSelectstart = ("onselectstart" in document.documentElement);
+
+var fromCellMenu;
 /* // should the need arise, test for css user-select
 $.support.cssUserSelect = (function(){
     var t = false,
@@ -130,13 +134,18 @@ var // currently active contextMenu trigger
                 right = $win.scrollLeft() + $win.width(),
                 height = opt.$menu.height(),
                 width = opt.$menu.width();
+
             
+
             if (offset.top + height > bottom) {
                 offset.top -= height;
             }
-            
-            if (offset.left + width > right) {
-                offset.left -= width;
+
+            if (fromCellMenu) {
+                offset.left -= width - 26;
+            } 
+            else if (offset.left + width > right) {
+                offset.left -= width;         
             }
             
             opt.$menu.css(offset);
@@ -154,10 +163,22 @@ var // currently active contextMenu trigger
                 }).css('display', '');
             } else {
                 // determine contextMenu position
-                var offset = {
-                    top: 0,
-                    left: this.outerWidth()
-                };
+                var offset;
+
+                //open submenu on the right side, if it overflow the body of page
+                if(this.parent()[0].offsetLeft + this.outerWidth() + this.children("ul").outerWidth() > $("body").outerWidth()) {
+                    offset = {
+                        top: 0,
+                        left: -this.children("ul").outerWidth()
+                    };
+                }
+                else {
+                    offset = {
+                        top: 0,
+                        left: this.outerWidth()
+                    };
+                }
+                
                 $menu.css(offset);
             }
         },
@@ -210,6 +231,16 @@ var // currently active contextMenu trigger
         
         // contextmenu show dispatcher
         contextmenu: function(e) {
+
+            //event e has the property button only if it is real mouse event.
+            //in case that e.button does not exist, we know that the event e is artifically triggered by jQuery
+            if(e.button) {
+                fromCellMenu = false;
+            }
+            else {
+                fromCellMenu = true;
+            }
+
             var $this = $(this);
             
             // disable actual context-menu
@@ -405,7 +436,7 @@ var // currently active contextMenu trigger
                 }
 
                 root.$menu.trigger('contextmenu:hide');
-            }, 50);
+            }, 100);
         },
         // key handled :hover
         keyStop: function(e, opt) {
